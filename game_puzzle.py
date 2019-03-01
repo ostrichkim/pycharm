@@ -1,14 +1,36 @@
 from random import randint
 
-"""
-이제 직사각형도 가능하게, array 수를 정할 수 있게 하자.
-행과 열을 input으로 받는다.
-0~(행 x 열)까지의 수를 iterate 하면서 str으로 변환해 넣고 마지막은 ''을 넣기
-행만큼 for문 돌려서 그 안에서 열만큼 for문 돌려 값 넣기.
-"""
+goal = []
 
-goal = [['1','2','3'],['4','5','6'],['7','8','']]
-arry = [['1','2','3'],['4','5','6'],['7','8','']]
+def array_setup(data):
+    while True:
+        try:
+            row = int(input("Number of rows?: "))
+            col = int(input("Number of columns?: "))
+            break
+        except ValueError:
+            print("Please insert an integer for each question.")
+    figure = [str(x) for x in range(1, row * col + 1)]
+
+    for r in range(row):
+        col_list = []
+        for c in range(col):
+            num = figure.pop(0)
+            col_list.append(num)
+        data.append(col_list)
+
+    return data
+
+array_setup(goal)
+arry = []
+for a in goal:
+    col_list = []
+    for b in a:
+        col_list.append(b)
+    arry.append(col_list)
+
+goal[-1][-1] = ''
+arry[-1][-1] = ''
 
 def return_index(data, val):
     a = 0
@@ -27,7 +49,6 @@ def shuffle(data):
         empty_idx = return_index(data, '')
         row_or_col = randint(0, 1)
 
-        # row_or_col이 0이면 row 변경, 1이면 col 변경. 근데 똑같은자리에다가 해버리면?변경안되면?
         if row_or_col == 0:
             target_idx = (randint(max(0, empty_idx[0]-1), min(len(data) - 1, empty_idx[0]+1)), empty_idx[1])
             data[target_idx[0]][target_idx[1]], data[empty_idx[0]][empty_idx[1]] = data[empty_idx[0]][empty_idx[1]], data[target_idx[0]][target_idx[1]]
@@ -43,17 +64,16 @@ shuffle(arry)
 
 def move(data):
     if data == goal:
+        print("*"*20)
+        for line in data:
+            print(line)
         print("Congratulations! You made it!")
-        print(data[0])
-        print(data[1])
-        print(data[2])
         return
 
     while True:
         empty_idx = return_index(data, '')
-        print(data[0])
-        print(data[1])
-        print(data[2])
+        for line in data:
+            print(line)
         try:
             target_val = str(input("Which block do you want to move?: "))
             target_idx = return_index(data, target_val)
@@ -73,4 +93,4 @@ def move(data):
 
     return move(data)
 
-a = move(arry)
+test = move(arry)
