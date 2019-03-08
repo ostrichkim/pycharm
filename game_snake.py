@@ -1,4 +1,4 @@
-import time, os
+import time, os, keyboard
 #import threading
 
 # Linked list로 size만큼 몸통연결
@@ -28,6 +28,7 @@ class Snake_game:
         self.head = snake_head
         self.tail = snake_head
         self.body_size = 1
+        self.direction = 'up'
 
     def print_screen(self):
         # self.screen 좌표에 뱀과 사과를 넣고 line by line print
@@ -40,13 +41,27 @@ class Snake_game:
             print(line)
 
     def auto_move(self):
-        # 자동이동. 벽에 부딪히면 쥬금
+        if self.direction = 'up':
+
+        # 앞으로만 자동이동. 벽에 부딪히면 쥬금
         pass
 
     def user_move(self):
-        # 엔터 안 치고 버튼 press만 해도 인풋으로 인식하게 하기
         # 방향에 따라 상/하/좌/우 함수를 실행시키고 거기서 계속 변경
-        pass
+        while True:
+            try:
+                if keyboard.is_pressed('up'):
+                    print('up')
+                elif keyboard.is_pressed('down'):
+                    print('down')
+                elif keyboard.is_pressed('left'):
+                    print('left')
+                elif keyboard.is_pressed('right'):
+                    print('right')
+                else:
+                    pass
+            except:
+                pass
 
     def add_body(self):
         # 추가된 몸통 좌표값은 앞 몸통의 좌표값을 이어받는 걸로, 앞에는 그냥 한 칸 앞으로 나가는 걸로 만들기
