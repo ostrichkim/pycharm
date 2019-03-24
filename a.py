@@ -1,16 +1,14 @@
-import os, time
+import click
 
-os.system('clear')
-print(' '*9, '\n', ' '*3, '***', ' '*3, '\n', ' '*9)
+k = click.getchar()
 
-time.sleep(0.3)
-os.system('cls')
-print(' '*9, '\n', ' '*4, '***', ' '*2, '\n', ' '*9)
+print(k)
 
-time.sleep(0.3)
-os.system('cls')
-print(' '*9, '\n', ' '*5, '***', ' '*1, '\n', ' '*9)
-
-time.sleep(0.3)
-os.system('cls')
-print(' '*9, '\n', ' '*6, '***', ' '*0, '\n', ' '*9)
+if k == "\x1b[A":
+    print("up")
+elif k == "\x1b[B":
+    print('down')
+elif k == "\x1b[D":
+    print('left')
+elif k == "\x1b[C":
+    print('right')
