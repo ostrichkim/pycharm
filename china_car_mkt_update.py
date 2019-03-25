@@ -77,7 +77,6 @@ curs.execute("SELECT group_name, company_n, company, make_brand FROM cars2 WHERE
 check = curs.fetchall()
 
 # nation에 분류되지 않는 신규회사가 있으면 작업중단, 없으면 계속 고
-# 문제!!!!!!! Beijing New Energy Vehicle (BJEV)/Dongfeng Nissan Passenger Vehicle/n.a. 이건 왜 missing 되지??
 if check:
     print("***There are some unclassified companies. (group_name, company_n, company, make_brand)")
     print(check)
