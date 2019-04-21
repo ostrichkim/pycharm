@@ -36,15 +36,16 @@ class Snake_game:
 
         Snake_game.apple_regen(self)
         Snake_game.print_screen(self)
-        Snake_game.auto_move(self)
+        Snake_game.user_move(self)
 
-        t = threading.Thread(target=Snake_game.user_move, args=(self))
+        t = threading.Thread(target=Snake_game.auto_move, args=(self))
         t.start()
 
     def print_screen(self):
         # 기존화면 지우고, self.screen 좌표에 뱀과 사과를 넣고 line by line print
         clear()
         current_body = self.head
+        self.screen = [list(' ' * self.pixel) for a in range(self.pixel)]
         self.screen[current_body.coordinate[0]][current_body.coordinate[1]] = '*'
 
         while current_body.next is not None:
@@ -68,64 +69,69 @@ class Snake_game:
         else:
             Snake_game.single_move(self, 0, +1)
 
-        if self.head.coordinate == self.apple:
-            Snake_game.eat_apple(self)
-
-        Snake_game.print_screen(self)
         time.sleep(1)
         if self.alive:
             Snake_game.auto_move(self)
 
     # 머리만 앞으로가고 나머지는 따라와!
+    # 갈 방향에 사과가 있으면 eat_apple 실행, 벽에 부딪히게 생겼으면 self.alive = False, 그게 아니면 그냥 ㄱㄱ
     def single_move(self, row, column):
         current_body = self.head
-        temp = current_body.coordinate
-        current_body.coordinate = [current_body.coordinate[0] + row, current_body.coordinate[1] + column]
+        snake_linked_coordinate = [current_body.coordinate]
+        while current_body.next is not None:
+            current_body = current_body.next
+            snake_linked_coordinate.append(current_body.coordinate)
 
-        if current_body.coordinate[0] <= self.pixel and current_body.coordinate[1] <= self.pixel and current_body.coordinate[0] >= 0 and current_body.coordinate[1] >= 0:
-            while current_body.next is not None:
-                current_body = current_body.next
-                current_body.coordinate, temp = temp, current_body.coordinate
+        if self.apple == [self.head.coordinate[0] + row, self.head.coordinate[1] + column]:
+            Snake_game.eat_apple(self)
 
-        else:
+        elif self.head.coordinate[0] + row >= self.pixel or self.head.coordinate[1] + column >= self.pixel or self.head.coordinate[0] + row < 0 or self.head.coordinate[1] + column < 0:
             print("Ouch! Your snake crashed into a wall.")
             print("Game Over")
             self.alive = False
             quit()
 
-    # 방향에 따라 상/하/좌/우 바꾸고 1번씩 이동함수 실행
-    def user_move(self):
-        while True:
-            try:
-                k = click.getchar()
-                if k == "\xe0H" or k == "\x1b[A":
-                    self.direction = 'up'
-                    Snake_game.single_move(self, -1, 0)
-                elif k == "\xe0P" or k == "\x1b[B":
-                    self.direction = 'down'
-                    Snake_game.single_move(self, +1, 0)
-                elif k == "\xe0K" or k == "\x1b[D":
-                    self.direction = 'left'
-                    Snake_game.single_move(self, 0, -1)
-                elif k == "\xe0M" or k == "\x1b[C":
-                    self.direction = 'right'
-                    Snake_game.single_move(self, 0, +1)
-                else:
-                    pass
-            except:
-                pass
+        elif [self.head.coordinate[0] + row, self.head.coordinate[1] + column] in snake_linked_coordinate:
+            print("Ouch! Your snake stepped on its own body.")
+            print("Game Over")
+            self.alive = False
+            quit()
 
-        if self.head.coordinate == self.apple:
-            Snake_game.eat_apple(self)
+        else:
+            temp = self.head.coordinate
+            self.head.coordinate = [self.head.coordinate[0] + row, self.head.coordinate[1] + column]
+            current_body = self.head
+            while current_body.next is not None:
+                current_body = current_body.next
+                current_body.coordinate, temp = temp, current_body.coordinate
 
         Snake_game.print_screen(self)
+
+    # 방향에 따라 상/하/좌/우 바꾸고 1번씩 이동함수 실행
+    def user_move(self):
+        k = click.getchar()
+        if k == "w":
+            self.direction = 'up'
+            Snake_game.single_move(self, -1, 0)
+        elif k == "s":
+            self.direction = 'down'
+            Snake_game.single_move(self, +1, 0)
+        elif k == "a":
+            self.direction = 'left'
+            Snake_game.single_move(self, 0, -1)
+        elif k == "d":
+            self.direction = 'right'
+            Snake_game.single_move(self, 0, +1)
+        else:
+            pass
+
         if self.alive:
             Snake_game.user_move(self)
 
     # 사과먹을 때. 이때 사과의 좌표 = 새로운 head 좌표
     def eat_apple(self):
         new_head = Snake_piece(self.apple)
-        self.head.next = self.head
+        new_head.next = self.head
         self.head = new_head
         self.body_size += 1
         time.sleep(1)
@@ -144,6 +150,5 @@ class Snake_game:
         self.apple = self.head.coordinate
         while self.apple in snake_linked_coordinate:
             self.apple = [random.randrange(0, self.pixel), random.randrange(0, self.pixel)]
-
 
 user1 = Snake_game()

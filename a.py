@@ -2,13 +2,13 @@ import click
 
 k = click.getchar()
 
-print(k)
+if k == "w":
+    print(k,'up')
+elif k == "s":
+    print(k,'down')
+elif k == "a":
+    print(k,'left')
+elif k == "d":
+    print(k,'right')
 
-if k == "\x1b[A":
-    print("up")
-elif k == "\x1b[B":
-    print('down')
-elif k == "\x1b[D":
-    print('left')
-elif k == "\x1b[C":
-    print('right')
+print(k)
