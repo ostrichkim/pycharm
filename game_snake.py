@@ -19,7 +19,8 @@ class Snake_game:
         while True:
             try:
                 self.pixel = int(input("How many pixels?: "))
-                break
+                if self.pixel > 3:
+                    break
             except TypeError:
                 print("Please type an integer.")
 
@@ -27,9 +28,13 @@ class Snake_game:
 
         center_coordinate = self.pixel//2
         snake_head = Snake_piece([center_coordinate, center_coordinate])
+        snake_body = Snake_piece([center_coordinate + 1, center_coordinate])
+        snake_tail = Snake_piece([center_coordinate + 2, center_coordinate])
         self.head = snake_head
-        self.tail = snake_head
-        self.body_size = 1
+        self.tail = snake_tail
+        self.head.next = snake_body
+        self.head.next.next = self.tail
+        self.body_size = 3
         self.direction = 'up'
 
         self.alive = True
@@ -45,14 +50,17 @@ class Snake_game:
         # 기존화면 지우고, self.screen 좌표에 뱀과 사과를 넣고 line by line print
         clear()
         current_body = self.head
-        self.screen = [list(' ' * self.pixel) for a in range(self.pixel)]
-        self.screen[current_body.coordinate[0]][current_body.coordinate[1]] = '*'
+        self.screen = [list('#' + ' ' * self.pixel + '#') for a in range(self.pixel)]
+        self.screen.insert(0,'#' * (self.pixel+2))
+        self.screen.append('#' * (self.pixel+2))
+
+        self.screen[current_body.coordinate[0]+1][current_body.coordinate[1]+1] = 'o'
 
         while current_body.next is not None:
             current_body = current_body.next
-            self.screen[current_body.coordinate[0]][current_body.coordinate[1]] = '*'
+            self.screen[current_body.coordinate[0]+1][current_body.coordinate[1]+1] = '*'
 
-        self.screen[self.apple[0]][self.apple[1]] = 'a'
+        self.screen[self.apple[0]+1][self.apple[1]+1] = 'a'
 
         for line in self.screen:
             line = ''.join(line)
@@ -70,7 +78,8 @@ class Snake_game:
         if self.apple == [self.head.coordinate[0] + row, self.head.coordinate[1] + column]:
             Snake_game.eat_apple(self)
 
-        elif self.head.coordinate[0] + row >= self.pixel or self.head.coordinate[1] + column >= self.pixel or self.head.coordinate[0] + row < 0 or self.head.coordinate[1] + column < 0:
+        elif self.head.coordinate[0] + row + 1 >= self.pixel or self.head.coordinate[1] + column >= self.pixel \
+                or self.head.coordinate[0] + row + 1 < 0 or self.head.coordinate[1] + column < 0:
             print("Ouch! Your snake crashed into a wall.")
             print("Game Over")
             self.alive = False
