@@ -36,10 +36,10 @@ class Snake_game:
 
         Snake_game.apple_regen(self)
         Snake_game.print_screen(self)
-        Snake_game.user_move(self)
-
-        t = threading.Thread(target=Snake_game.auto_move, args=(self))
+        t = threading.Thread(target=Snake_game.auto_move, args=(self,))
         t.start()
+        Snake_game.user_move(self)
+        t.join()
 
     def print_screen(self):
         # 기존화면 지우고, self.screen 좌표에 뱀과 사과를 넣고 line by line print
@@ -58,23 +58,8 @@ class Snake_game:
             line = ''.join(line)
             print(line)
 
-    # 1초에 한 번 자동으로 움직이고 계속 반복(single_move에서 벽에 부딪힐 때까지)
-    def auto_move(self):
-        if self.direction == 'up':
-            Snake_game.single_move(self, -1, 0)
-        elif self.direction == 'down':
-            Snake_game.single_move(self, +1, 0)
-        elif self.direction == 'left':
-            Snake_game.single_move(self, 0, -1)
-        else:
-            Snake_game.single_move(self, 0, +1)
-
-        time.sleep(1)
-        if self.alive:
-            Snake_game.auto_move(self)
-
     # 머리만 앞으로가고 나머지는 따라와!
-    # 갈 방향에 사과가 있으면 eat_apple 실행, 벽에 부딪히게 생겼으면 self.alive = False, 그게 아니면 그냥 ㄱㄱ
+    # 갈 방향에 사과가 있으면 eat_apple 실행, 벽이나 자기 몸에 부딪히게 생겼으면 self.alive = False, 그게 아니면 그냥 ㄱㄱ
     def single_move(self, row, column):
         current_body = self.head
         snake_linked_coordinate = [current_body.coordinate]
@@ -107,6 +92,21 @@ class Snake_game:
 
         Snake_game.print_screen(self)
 
+    # 1초에 한 번 자동으로 움직이고 계속 반복(single_move에서 벽에 부딪힐 때까지)
+    def auto_move(self):
+        if self.direction == 'up':
+            Snake_game.single_move(self, -1, 0)
+        elif self.direction == 'down':
+            Snake_game.single_move(self, +1, 0)
+        elif self.direction == 'left':
+            Snake_game.single_move(self, 0, -1)
+        else:
+            Snake_game.single_move(self, 0, +1)
+
+        time.sleep(1)
+        if self.alive:
+            Snake_game.auto_move(self)
+
     # 방향에 따라 상/하/좌/우 바꾸고 1번씩 이동함수 실행
     def user_move(self):
         k = click.getchar()
@@ -134,7 +134,6 @@ class Snake_game:
         new_head.next = self.head
         self.head = new_head
         self.body_size += 1
-        time.sleep(1)
 
         Snake_game.apple_regen(self)
 
