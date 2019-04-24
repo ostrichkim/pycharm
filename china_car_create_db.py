@@ -1,11 +1,6 @@
 """
-첫번째 칼럼을 year로 바꾸고, 1~12월 데이터를 모두 db에 축적(insert) -> 주의: 1개년도 월별로만 데이터 뽑아오기
-최근데이터는 파이썬에서 update or insert 함수 만들어서, where group_n, company_n, model 등이 모두 일치하면 update, 없으면 insert
-group_classification에 없는게 생기면(new data) 자동으로 알려주도록하기
-(다른 python file에 넣을 기능)자유자재로 뽑아오도록 변경하기
-input()을 쓰도록 한다.
-시점: 월별데이터/누적데이터/연간데이터(1-12월 누적으로)
-분류: 그룹별, 메이커별, 세그먼트별, 모델별
+raw data는 1개년도 월별로만 데이터 뽑아옴
+맨 첫번째 행을 삭제하고, niou 2의 특수문자를 제거한 뒤 2019.csv로 저장하고 아래 코드 돌리기
 """
 
 import csv, sqlite3
@@ -90,14 +85,16 @@ curs.execute(cars2)
 # Japan
 upt = "UPDATE cars2 SET nation = 'japan' WHERE nation IS NULL AND (company = 'Suzuki' OR company = 'Mazda' " \
       "OR company_n = 'Beijing New Energy Vehicle (BJEV)/Dongfeng Nissan Passenger Vehicle/n.a.'" \
-      "OR company = 'Mitsubishi');"
+      "OR company = 'Mitsubishi' OR company_n = 'Guangqi Honda Automobile/Honda Automobile (China)(-2018)/Honda Automobile (China)(2019-)');"
 curs.execute(upt)
 conn.commit()
 # China
 upt = "UPDATE cars2 SET nation = 'china' WHERE nation IS NULL AND (company = 'Geely Holding Group' OR company = 'Mazda' " \
       "OR company = 'FAW (China FAW Group Corp.)' OR company = 'Anhui Jianghuai Automotive Group' OR company = 'BAIC Group' " \
       "OR company = 'Fujian Motor Industrial Group Co. (FJMG)' OR company = ' Small and Medium OEM'" \
-      "OR company_n = 'FAW Haima Automobile/n.a.' OR company = 'Dongfeng (Dongfeng Motor Corp.)' OR company = 'Other/Adjustment');"
+      "OR company_n = 'FAW Haima Automobile/n.a.' OR company = 'Dongfeng (Dongfeng Motor Corp.)' OR company = 'Other/Adjustment')" \
+      "OR company_n = 'Chongqing Changan Automobile/Hefei Changan Automobile'" \
+      "OR company_n = 'Hunan Jiangnan Automobile Mfg./Zotye Automobile New Energy Automobile Production Base';"
 curs.execute(upt)
 conn.commit()
 # U.S.
