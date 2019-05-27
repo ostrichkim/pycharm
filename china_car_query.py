@@ -8,7 +8,7 @@ curs = conn.cursor()
 
 # column 이름 나열
 curs.execute('PRAGMA TABLE_INFO(cars2)')
-labels = [tup[1] for tup in curs.fetchall()]
+labels = [tup[1] for tup in curs.fetchall()]*2
 
 year = int(input("Which year?"))
 select_month = int(input("Select month (For yearly data, type 12): "))
@@ -95,8 +95,10 @@ def query(year, condition, group_by):
 
     return final_result
 
-rslt_last = query(year-1, '', 'nation')
-rslt_current = query(year, '', 'nation')
+by_nation_last = query(year-1, '', 'nation')
+by_nation_current = query(year, '', 'nation')
+by_type_last = query(year-1, '', 'type')
+by_type_current = query(year, '', 'type')
 
 # 첫번째 쿼리 저장(스키마와 상위 25개 업체 total, 그리고 처음 선택 쿼리)
 with open('{0}china_car_query.csv'.format(wk_dir), 'w', encoding='utf-8', newline='') as query_csv:
@@ -104,9 +106,15 @@ with open('{0}china_car_query.csv'.format(wk_dir), 'w', encoding='utf-8', newlin
     writer.writerow(labels)
     writer.writerows(by_company_n_join)
     writer.writerow('\n')
-    writer.writerows(rslt_last)
+    writer.writerow('By Nation')
+    writer.writerows(by_nation_last)
     writer.writerow('\n')
-    writer.writerows(rslt_current)
+    writer.writerows(by_nation_current)
+    writer.writerow('\n')
+    writer.writerow('By Type')
+    writer.writerows(by_type_last)
+    writer.writerow('\n')
+    writer.writerows(by_type_current)
 
 cont = input("Do you want to continue?(Y/N): ")
 
