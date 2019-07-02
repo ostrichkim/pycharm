@@ -84,7 +84,6 @@ curs.execute(cars2)
 # nation이 null이면 company 또는 company_n에 따라 nation 값 삽입 -> 여기는 계속 수기로 추가해주기
 # Japan
 upt = "UPDATE cars2 SET nation = 'japan' WHERE nation IS NULL AND (company = 'Suzuki' OR company = 'Mazda' " \
-      "OR company_n = 'Beijing New Energy Vehicle (BJEV)/Dongfeng Nissan Passenger Vehicle/n.a.'" \
       "OR company = 'Mitsubishi' OR company_n = 'Guangqi Honda Automobile/Honda Automobile (China)(-2018)/Honda Automobile (China)(2019-)');"
 curs.execute(upt)
 conn.commit()
@@ -92,9 +91,7 @@ conn.commit()
 upt = "UPDATE cars2 SET nation = 'china' WHERE nation IS NULL AND (company = 'Geely Holding Group' OR company = 'Mazda' " \
       "OR company = 'FAW (China FAW Group Corp.)' OR company = 'Anhui Jianghuai Automotive Group' OR company = 'BAIC Group' " \
       "OR company = 'Fujian Motor Industrial Group Co. (FJMG)' OR company = ' Small and Medium OEM'" \
-      "OR company_n = 'FAW Haima Automobile/n.a.' OR company = 'Dongfeng (Dongfeng Motor Corp.)' OR company = 'Other/Adjustment')" \
-      "OR company_n = 'Chongqing Changan Automobile/Hefei Changan Automobile'" \
-      "OR company_n = 'Hunan Jiangnan Automobile Mfg./Zotye Automobile New Energy Automobile Production Base';"
+      "OR company = 'Dongfeng (Dongfeng Motor Corp.)' OR company = 'Other/Adjustment');"
 curs.execute(upt)
 conn.commit()
 # U.S.
