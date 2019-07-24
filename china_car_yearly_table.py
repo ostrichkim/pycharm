@@ -77,18 +77,85 @@ top25 = "SELECT * FROM combined;"
 curs.execute(top25)
 rslt = curs.fetchall()
 
-
-# Header 달기
+# 불필요한 열 건너뛰고 데이터만 저장 => 이거 나중에 reverse slicing으로 순서대로 나오게 뽑기. header도. row_list[0,1,-2]
 new_result = []
 for row in rslt:
     row_list = list(row)
     row = row_list[:2] + row_list[2::2]
     new_result.append(row)
 
+# Header 달기
 num_year = len(new_result[0])-2
 header1 = ['nation','group_name']
 for y in range(num_year):
     header1.append('{0}'.format(year-y))
+
+# 국별 판매량
+b_nation = "SELECT nation, year, (SUM(M1)+SUM(M2)+SUM(M3)+SUM(M4)+SUM(M5)+SUM(M6)+SUM(M7)+SUM(M8)+SUM(M9)+SUM(M10) " \
+           "+SUM(M11)+SUM(M12)) AS total FROM cars2 GROUP BY year, nation ORDER BY year DESC, nation ASC;"
+curs.execute(b_nation)
+by_nation = curs.fetchall()
+
+# 행으로 나열된 year를 열로 옮기기
+nation_list = []
+china = ['china']
+europe = ['europe']
+japan = ['japan']
+korea = ['korea']
+malaysia = ['malaysia']
+# 말레이시아는 2009년부터 2015년까지만 데이터가 존재
+if num_year > 8:
+    for y in range(num_year-8):
+        malaysia.append('')
+us = ['us']
+for row in by_nation:
+    if row[0] == 'china':
+        china.append(row[2])
+    elif row[0] == 'europe':
+        europe.append(row[2])
+    elif row[0] == 'japan':
+        japan.append(row[2])
+    elif row[0] == 'korea':
+        korea.append(row[2])
+    elif row[0] == 'malaysia':
+        malaysia.append(row[2])
+    elif row[0] == 'us':
+        us.append(row[2])
+nation_list = [china, europe, japan, korea, malaysia, us]
+
+# Header 달기
+header2 = ['nation']
+for y in range(num_year):
+    header2.append('{0}'.format(year-y))
+
+# 차종별 판매량
+b_type = "SELECT type, year, (SUM(M1)+SUM(M2)+SUM(M3)+SUM(M4)+SUM(M5)+SUM(M6)+SUM(M7)+SUM(M8)+SUM(M9)+SUM(M10)" \
+         "+SUM(M11)+SUM(M12)) AS total FROM cars2 GROUP BY year, type ORDER BY year DESC, type ASC;"
+curs.execute(b_type)
+by_type = curs.fetchall()
+
+# 행으로 나열된 year를 열로 옮기기
+type_list = []
+Sedan_Hatchback = ['Sedan/Hatchback']
+SUV = ['SUV']
+MPV = ['MPV']
+Mini_Van = ['Mini Van']
+
+for row in by_type:
+    if row[0] == 'Sedan/Hatchback':
+        Sedan_Hatchback.append(row[2])
+    elif row[0] == 'SUV':
+        SUV.append(row[2])
+    elif row[0] == 'MPV':
+        MPV.append(row[2])
+    elif row[0] == 'Mini Van':
+        Mini_Van.append(row[2])
+type_list = [Sedan_Hatchback, SUV, MPV, Mini_Van]
+
+# Header 달기
+header3 = ['type']
+for y in range(num_year):
+    header3.append('{0}'.format(year-y))
 
 # 쿼리 저장
 with open('{0}china_car_yearly_table.csv'.format(wk_dir), 'w', encoding='utf-8', newline='') as table_csv:
@@ -96,3 +163,9 @@ with open('{0}china_car_yearly_table.csv'.format(wk_dir), 'w', encoding='utf-8',
     writer.writerow(header1)
     writer.writerows(new_result)
     writer.writerow('\n')
+    writer.writerow(header2)
+    writer.writerows(nation_list)
+    writer.writerow('\n')
+    writer.writerow(header3)
+    writer.writerows(type_list)
+
