@@ -1,9 +1,9 @@
 """
 raw data는 1개년도 월별로만 데이터 뽑아옴
-맨 첫번째 행을 삭제하고, niou 2의 특수문자를 제거한 뒤 2019.csv로 저장하고 아래 코드 돌리기
+맨 첫번째 행을 삭제해서 2019.csv로 저장하고 아래 코드 돌리기
 """
 
-import csv, sqlite3
+import csv, sqlite3, re
 
 wk_dir = 'C:\\Users\\KAMA13\\china_car\\'
 
@@ -11,11 +11,10 @@ wk_dir = 'C:\\Users\\KAMA13\\china_car\\'
 conn = sqlite3.connect('{0}china_car.sql'.format(wk_dir))
 curs = conn.cursor()
 
-# 분류테이블 및 스키마 생성(얘는 계속 수정해야 하니까 표를 drop했다가 create)
+# 분류테이블 및 스키마 생성(계속 수정해야 하니까 표를 drop했다가 create)
 curs.execute("DROP TABLE IF EXISTS classification")
 curs.execute("CREATE TABLE classification ("
-             "company_n TEXT PRIMARY KEY, group_name TEXT, nation TEXT"
-             ");")
+             "company_n TEXT PRIMARY KEY, group_name TEXT, nation TEXT);")
 
 # CSV 파일 열어서 테이블에 분류데이터 INSERT
 with open('{0}group_classification.csv'.format(wk_dir), 'r', encoding='utf-8') as classification:
@@ -27,7 +26,6 @@ with open('{0}group_classification.csv'.format(wk_dir), 'r', encoding='utf-8') a
 
 # INSERT, UPDATE, DELETE문에서는 auto commit이 아니라서 fetchall() 안됨. 아래 코드로 commit 해줘야 db에 반영됨
 conn.commit()
-
 
 # 다운받은 raw data(csv) 열어서 preprocessing 후 저장
 year = input("Type current year: ")
@@ -43,15 +41,19 @@ with open('{0}{1}.csv'.format(wk_dir, year), 'r', encoding='utf-8') as cars:
             else:
                 row[a] = abs(int(row[a]))
 
+        # niou 등 특수문자를 제거. 전부 한글, 숫자, 알파벳으로 변경
+        row[5] = re.sub('[^가-힝0-9a-zA-Z\\s]', '', row[5])
+
         # 승용만 골라서 맨 끝 column 빼고, 첫번째 column은 해당 year로 바꿔서 저장
         if row[3] == 'Sedan/Hatchback' or row[3] == 'SUV' or row[3] == 'MPV' or row[3] == 'Mini Van':
             row[0] = year
             new.append(row[:-1])
 
-    # 새 csv 파일로 저장
+    # 새 csv 파일 "china_car"로 저장
     with open('{0}china_car.csv'.format(wk_dir), 'w', encoding='utf-8', newline='') as new_cars:
         writer = csv.writer(new_cars)
         writer.writerows(new)
+
 
 # raw_data 테이블, 스키마 생성
 car_schema = "CREATE TABLE IF NOT EXISTS cars (" \
@@ -71,6 +73,12 @@ with open('{0}china_car.csv'.format(wk_dir), 'r', encoding='utf-8') as cars:
                      "M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12, company_n)"
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
 conn.commit()
+
+# Rollback 옵션
+rollback = input("Would you like to revert the inserted data? (Y/N): ")
+if rollback == "Y":
+    curs.execute("DELETE FROM cars WHERE year = {0}".format(str(year)))
+    conn.commit()
 
 # SQL DB로 raw_data와 group classification LEFT JOIN해서 데이터를 cars2 테이블로 저장(기존 cars2 테이블은 삭제)
 clr = "DROP TABLE IF EXISTS cars2"

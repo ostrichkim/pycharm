@@ -116,7 +116,7 @@ with open('{0}china_car_query.csv'.format(wk_dir), 'w', encoding='utf-8', newlin
     writer.writerow('\n')
     writer.writerows(by_type_current)
 
-cont = input("Do you want to continue?(Y/N): ")
+cont = input("Do you want to continue? (Y/N): ")
 
 # 원하는 만큼 쿼리 계속 날리기
 while cont == 'Y':
@@ -132,7 +132,7 @@ while cont == 'Y':
         writer.writerow('\n')
         writer.writerows(add_query_current)
 
-    cont = input("Do you want to continue?(Y/N): ")
+    cont = input("Do you want to continue? (Y/N): ")
 
 """
 #뽑아야 할 테이블 목록
