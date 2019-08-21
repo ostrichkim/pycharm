@@ -41,7 +41,7 @@ with open('{0}{1}.csv'.format(wk_dir, year), 'r', encoding='utf-8') as cars:
             else:
                 row[a] = abs(int(row[a]))
 
-        # niou 등 특수문자를 제거. 전부 한글, 숫자, 알파벳으로 변경
+        # niou 등 특수문자를 제거. 전부 한글/숫자/알파벳으로 변경
         row[5] = re.sub('[^가-힝0-9a-zA-Z\\s]', '', row[5])
 
         # 승용만 골라서 맨 끝 column 빼고, 첫번째 column은 해당 year로 바꿔서 저장
@@ -77,8 +77,9 @@ conn.commit()
 # Rollback 옵션
 rollback = input("Would you like to revert the inserted data? (Y/N): ")
 if rollback == "Y":
-    curs.execute("DELETE FROM cars WHERE year = {0}".format(str(year)))
+    curs.execute("DELETE FROM cars WHERE year = {0}".format(year))
     conn.commit()
+    print("Your data for the year of %s was reverted." % year)
 
 # SQL DB로 raw_data와 group classification LEFT JOIN해서 데이터를 cars2 테이블로 저장(기존 cars2 테이블은 삭제)
 clr = "DROP TABLE IF EXISTS cars2"
@@ -89,14 +90,14 @@ cars2 = "CREATE TABLE cars2 AS SELECT nation, group_name, cars.company_n, compan
         "LEFT JOIN classification ON cars.company_n = classification.company_n;"
 curs.execute(cars2)
 
-# nation이 null이면 company 또는 company_n에 따라 nation 값 삽입 -> 여기는 계속 수기로 추가해주기
+# nation이 null이면 company에 따라 nation 값 삽입 -> 여기는 계속 수기로 추가
 # Japan
 upt = "UPDATE cars2 SET nation = 'japan' WHERE nation IS NULL AND (company = 'Suzuki' OR company = 'Mazda' " \
-      "OR company = 'Mitsubishi' OR company_n = 'Guangqi Honda Automobile/Honda Automobile (China)(-2018)/Honda Automobile (China)(2019-)');"
+      "OR company = 'Mitsubishi');"
 curs.execute(upt)
 conn.commit()
 # China
-upt = "UPDATE cars2 SET nation = 'china' WHERE nation IS NULL AND (company = 'Geely Holding Group' OR company = 'Mazda' " \
+upt = "UPDATE cars2 SET nation = 'china' WHERE nation IS NULL AND (company = 'Geely Holding Group' " \
       "OR company = 'FAW (China FAW Group Corp.)' OR company = 'Anhui Jianghuai Automotive Group' OR company = 'BAIC Group' " \
       "OR company = 'Fujian Motor Industrial Group Co. (FJMG)' OR company = ' Small and Medium OEM'" \
       "OR company = 'Dongfeng (Dongfeng Motor Corp.)' OR company = 'Other/Adjustment');"

@@ -10,7 +10,7 @@ curs = conn.cursor()
 curs.execute('PRAGMA TABLE_INFO(cars2)')
 labels = [tup[1] for tup in curs.fetchall()]*2
 
-year = int(input("Which year?"))
+year = int(input("Select year: "))
 select_month = int(input("Select month (For yearly data, type 12): "))
 
 clr = "DROP TABLE IF EXISTS top1"
