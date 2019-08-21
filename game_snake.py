@@ -22,7 +22,7 @@ class Snake_game:
                 if self.pixel > 3:
                     break
             except TypeError:
-                print("Please type an integer.")
+                print("Please type an integer greater than 3.")
 
         self.screen = [list(' '*self.pixel) for a in range(self.pixel)]
 
@@ -36,7 +36,6 @@ class Snake_game:
         self.head.next.next = self.tail
         self.body_size = 3
         self.direction = 'up'
-
         self.alive = True
 
         Snake_game.apple_regen(self)
@@ -78,8 +77,8 @@ class Snake_game:
         if self.apple == [self.head.coordinate[0] + row, self.head.coordinate[1] + column]:
             Snake_game.eat_apple(self)
 
-        elif self.head.coordinate[0] + row + 1 >= self.pixel or self.head.coordinate[1] + column >= self.pixel \
-                or self.head.coordinate[0] + row + 1 < 0 or self.head.coordinate[1] + column < 0:
+        elif self.head.coordinate[0] + row >= self.pixel or self.head.coordinate[1] + column >= self.pixel \
+                or self.head.coordinate[0] + row < 0 or self.head.coordinate[1] + column < 0:
             print("Ouch! Your snake crashed into a wall.")
             print("Game Over")
             self.alive = False
