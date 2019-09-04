@@ -90,32 +90,55 @@ cars2 = "CREATE TABLE cars2 AS SELECT nation, group_name, cars.company_n, compan
         "LEFT JOIN classification ON cars.company_n = classification.company_n;"
 curs.execute(cars2)
 
-# nation이 null이면 company에 따라 nation 값 삽입 -> 여기는 계속 수기로 추가
-# Japan
-upt = "UPDATE cars2 SET nation = 'japan' WHERE nation IS NULL AND (company = 'Suzuki' OR company = 'Mazda' " \
-      "OR company = 'Mitsubishi');"
-curs.execute(upt)
-conn.commit()
-# China
-upt = "UPDATE cars2 SET nation = 'china' WHERE nation IS NULL AND (company = 'Geely Holding Group' " \
-      "OR company = 'FAW (China FAW Group Corp.)' OR company = 'Anhui Jianghuai Automotive Group' OR company = 'BAIC Group' " \
-      "OR company = 'Fujian Motor Industrial Group Co. (FJMG)' OR company = ' Small and Medium OEM'" \
-      "OR company = 'Dongfeng (Dongfeng Motor Corp.)' OR company = 'Other/Adjustment');"
-curs.execute(upt)
-conn.commit()
-# U.S.
-upt = "UPDATE cars2 SET nation = 'us' WHERE nation IS NULL AND (company = 'Ford Group');"
-curs.execute(upt)
-conn.commit()
-# Europe
-upt = "UPDATE cars2 SET nation = 'europe' WHERE nation IS NULL AND (company = 'FCA' OR company = 'Daimler Group');"
-curs.execute(upt)
-conn.commit()
 
+# company에 따라 group_name이 나뉘는 애들(cars.company_n)
+# FAW Car; Jiangxi Jiangling Holdings Ltd.; Jiangxi Changhe Suzuki Automobile (2014-); Zhengzhou Nissan Automobile
+set_category = 'group_name'
+where_category = 'company'
+
+def update(set_name, where_name):
+    upt = "UPDATE cars2 SET {0} = '{1}' WHERE {0} IS NULL AND ({2} = '{3}');".format(set_category, set_name, where_category, where_name)
+    curs.execute(upt)
+    conn.commit()
+
+update('Mazda', 'Mazda')
+update('Nissan', 'Renault-Nissan Alliance')
+update('Suzuki', 'Suzuki')
+update('Mitsubishi', 'Mitsubishi')
+update('Ford', 'Ford Group')
+update('Daimler', 'Daimler Group')
+update('FCA', 'FCA')
+update('Dongfeng', 'Dongfeng (Dongfeng Motor Corp.)')
+update('JMC', 'Jiangling Motors Co. Group')
+update('FAW', 'FAW (China FAW Group Corp.)')
+update('Geely Holding', 'Geely Holding Group')
+update('BAIC', 'BAIC Group')
+
+# group_name에 따라 nation 분류
+set_category = 'nation'
+where_category = 'group_name'
+update('japan', 'Mazda')
+update('japan', 'Nissan')
+update('japan', 'Suzuki')
+update('japan', 'Mitsubishi')
+update('us', 'Ford')
+update('europe', 'Daimler')
+update('europe', 'FCA')
+update('china', 'Dongfeng')
+update('china', 'JMC')
+update('china', 'FAW')
+update('china', 'Geely Holding')
+update('china', 'BAIC')
+
+# 분류 안되는 애들 nation은 china로
+where_category = 'company'
+update('china', ' Small and Medium OEM')
+update('china', 'Other/Adjustment')
+
+# nation에 분류되지 않는 신규회사가 있으면 작업중단, 없으면 계속 고
 curs.execute("SELECT group_name, company_n, company, make_brand FROM cars2 WHERE nation IS NULL;")
 check = curs.fetchall()
 
-# nation에 분류되지 않는 신규회사가 있으면 작업중단, 없으면 계속 고
 if check:
     print("***There are some unclassified companies. Please modify the classification table.\n(group_name, company_n, company, make_brand)")
     print(check)
