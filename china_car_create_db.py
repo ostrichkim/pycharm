@@ -134,6 +134,7 @@ update('china', 'BAIC')
 where_category = 'company'
 update('china', ' Small and Medium OEM')
 update('china', 'Other/Adjustment')
+update('china', 'N/A')
 
 # nation에 분류되지 않는 신규회사가 있으면 작업중단, 없으면 계속 고
 curs.execute("SELECT group_name, company_n, company, make_brand FROM cars2 WHERE nation IS NULL;")
