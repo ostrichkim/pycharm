@@ -113,6 +113,9 @@ update('JMC', 'Jiangling Motors Co. Group')
 update('FAW', 'FAW (China FAW Group Corp.)')
 update('Geely Holding', 'Geely Holding Group')
 update('BAIC', 'BAIC Group')
+update('Brilliance', 'Brilliance Automobile Group')
+update('SAIC', 'SAIC (Shanghai Automotive Industry Corporation (Group))')
+
 
 # group_name에 따라 nation 분류
 set_category = 'nation'
@@ -129,6 +132,8 @@ update('china', 'JMC')
 update('china', 'FAW')
 update('china', 'Geely Holding')
 update('china', 'BAIC')
+update('china', 'Brilliance')
+update('china', 'SAIC')
 
 # 분류 안되는 애들 nation은 china로
 where_category = 'company'
