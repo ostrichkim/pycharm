@@ -1,3 +1,3 @@
 # pycharm
 
-# Hello hello Hello
+# DB management program for china car sales and production data
